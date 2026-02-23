@@ -29,11 +29,18 @@ st.markdown("""
 BASE_DIR = Path(__file__).resolve().parent
 MOVIES_PKL = BASE_DIR / "movies.pkl"
 SIMILARITY_PKL = BASE_DIR / "similarity.pkl"
+KEY_FILE = BASE_DIR / "tmdb_key.txt"
 
 st.title("Movie Recommender System")
 st.write("Pick a movie to see your top 5 recommendations")
 
 api_key = os.getenv("TMDB_API_KEY", "").strip()
+# fallback: read key from a local file if env var isn't set
+if not api_key and KEY_FILE.exists():
+	try:
+		api_key = KEY_FILE.read_text(encoding="utf-8").strip()
+	except Exception:
+		api_key = ""
 
 
 @st.cache_resource
@@ -76,9 +83,18 @@ try:
 	movies_df, similarity = load_artifacts()
 	selected_movie = st.selectbox("Select a movie", movies_df["title"].tolist())
 	if st.button("Recommend"):
+		# if no API key, prompt user to enter & save it (persistent file)
 		if not api_key:
-			st.error("TMDB_API_KEY is not set. Posters require a TMDB API key.")
-			st.stop()
+			st.info("TMDB API key not found. Enter it below to display posters.")
+			input_key = st.text_input("Enter TMDB API Key", type="password")
+			if st.button("Save TMDB key") and input_key:
+				try:
+					KEY_FILE.write_text(input_key.strip(), encoding="utf-8")
+					api_key = input_key.strip()
+					st.experimental_rerun()
+				except Exception as e:
+					st.error(f"Failed to save key: {e}")
+
 		recs = recommend(selected_movie, movies_df, similarity)
 		if not recs:
 			st.warning("No recommendations found.")
