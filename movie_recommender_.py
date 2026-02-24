@@ -104,7 +104,7 @@ def fetch_director(obj):
 
 movies['crew']=movies['crew'].apply(fetch_director)
 
-movies['overview']= movies['overview'].apply(lambda x:x.split())
+movies['overview']= movies['overview'].apply(lambda x:x.split()) #converting into separated words
 
 #removing spaces between words for tags
 movies['genres']=movies['genres'].apply(lambda x:[i.replace(" ","") for i in x])

@@ -1,7 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
-*.pkl
-tmdb_5000_*.csv/
 .env
 .streamlit/secrets.toml
+tmdb_key.txt
+similarity.pkl

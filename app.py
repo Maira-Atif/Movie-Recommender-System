@@ -123,6 +123,7 @@ st.markdown("""
 
 BASE_DIR = Path(__file__).resolve().parent
 MOVIES_PKL = BASE_DIR / "movies.pkl"
+SIMILARITY_NPY = BASE_DIR / "similarity.npy"
 SIMILARITY_PKL = BASE_DIR / "similarity.pkl"
 KEY_FILE = BASE_DIR / "tmdb_key.txt"
 
@@ -142,8 +143,13 @@ if not api_key and KEY_FILE.exists():
 def load_artifacts():
 	with open(MOVIES_PKL, "rb") as handle:
 		movies_df = pickle.load(handle)
-	with open(SIMILARITY_PKL, "rb") as handle:
-		similarity = pickle.load(handle)
+    if SIMILARITY_NPY.exists():
+        similarity = __import__("numpy").load(SIMILARITY_NPY)
+    elif SIMILARITY_PKL.exists():
+        with open(SIMILARITY_PKL, "rb") as handle:
+            similarity = pickle.load(handle)
+    else:
+        raise FileNotFoundError("Missing similarity.npy or similarity.pkl")
 	return movies_df, similarity
 
 
@@ -226,4 +232,4 @@ try:
 					else:
 						st.caption("Similar content")
 except FileNotFoundError:
-	st.error("Missing movies.pkl or similarity.pkl. Run movie_recommender_.py first.")
+    st.error("Missing movies.pkl and/or similarity artifact. Run movie_recommender_.py first.")
