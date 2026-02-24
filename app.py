@@ -141,8 +141,9 @@ if not api_key and KEY_FILE.exists():
 
 @st.cache_resource
 def load_artifacts():
-	with open(MOVIES_PKL, "rb") as handle:
-		movies_df = pickle.load(handle)
+    with open(MOVIES_PKL, "rb") as handle:
+        movies_df = pickle.load(handle)
+
     if SIMILARITY_NPY.exists():
         similarity = __import__("numpy").load(SIMILARITY_NPY)
     elif SIMILARITY_PKL.exists():
@@ -150,7 +151,8 @@ def load_artifacts():
             similarity = pickle.load(handle)
     else:
         raise FileNotFoundError("Missing similarity.npy or similarity.pkl")
-	return movies_df, similarity
+
+    return movies_df, similarity
 
 
 def recommend(movie_title, movies_df, similarity, top_n=5):
